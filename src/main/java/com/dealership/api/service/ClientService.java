@@ -1,6 +1,8 @@
 package com.dealership.api.service;
 
 import com.dealership.api.entity.Client;
+import com.dealership.api.model.ClientRequest;
+import com.dealership.api.model.ClientResponse;
 import com.dealership.api.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +15,21 @@ public class ClientService {
         this.clientRepository = clientRepository;
     }
 
-    public Client inserir(Client client) {
-        return this.clientRepository.save(client);
+    public ClientResponse inserir(ClientRequest request) {
+        Client client = new Client();
+        client.setCpf(request.cpf());
+        client.setNome(request.nome());
+        client.setEmail(request.email());
+        client.setTelefone(request.telefone());
+
+        Client savedClient = this.clientRepository.save(client);
+
+        return new ClientResponse(
+                savedClient.getId(),
+                savedClient.getCpf(),
+                savedClient.getNome(),
+                savedClient.getEmail(),
+                savedClient.getTelefone()
+        );
     }
 }
