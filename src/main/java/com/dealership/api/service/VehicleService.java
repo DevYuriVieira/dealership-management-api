@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class VehicleService {
+
     private final VehicleRepository vehicleRepository;
     private final ClientRepository clientRepository;
 
@@ -20,7 +21,11 @@ public class VehicleService {
         this.clientRepository = clientRepository;
     }
 
-    public VehicleResponse inserir (VehicleRequest request) {
+    public VehicleResponse inserir(VehicleRequest request) {
+        if (Boolean.TRUE.equals(request.vendido()) && request.valorVenda() == null) {
+            throw new IllegalArgumentException("Informe o valor da venda para registrar o veículo como vendido.");
+        }
+
         if (this.vehicleRepository.existsByPlaca(request.placa())) {
             throw new DuplicateResourceException("Já existe um veículo cadastrado com a placa: " + request.placa());
         }
@@ -33,6 +38,10 @@ public class VehicleService {
         vehicle.setMarca(request.marca());
         vehicle.setModelo(request.modelo());
         vehicle.setAno(request.ano());
+        vehicle.setValor(request.valor());
+        vehicle.setMaximoDesconto(request.maximoDesconto());
+        vehicle.setVendido(request.vendido());
+        vehicle.setValorVenda(request.valorVenda());
         vehicle.setClient(donoDoVeiculo);
 
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
@@ -43,6 +52,10 @@ public class VehicleService {
                 savedVehicle.getMarca(),
                 savedVehicle.getModelo(),
                 savedVehicle.getAno(),
+                savedVehicle.getValor(),
+                savedVehicle.getMaximoDesconto(),
+                savedVehicle.getVendido(),
+                savedVehicle.getValorVenda(),
                 savedVehicle.getClient().getId()
         );
     }
