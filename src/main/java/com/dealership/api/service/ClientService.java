@@ -6,6 +6,9 @@ import com.dealership.api.model.ClientResponse;
 import com.dealership.api.repository.ClientRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ClientService {
 
@@ -31,5 +34,18 @@ public class ClientService {
                 savedClient.getEmail(),
                 savedClient.getTelefone()
         );
+    }
+
+    public List<ClientResponse> buscarTodos() {
+        return this.clientRepository.findAll()
+                .stream()
+                .map(client -> new ClientResponse(
+                        client.getId(),
+                        client.getCpf(),
+                        client.getNome(),
+                        client.getEmail(),
+                        client.getTelefone()
+                ))
+                .collect(Collectors.toList());
     }
 }
