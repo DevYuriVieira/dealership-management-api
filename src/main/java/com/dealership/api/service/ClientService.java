@@ -52,37 +52,31 @@ public class ClientService {
                 .collect(Collectors.toList());
     }
 
-    public ClientResponse buscarPorId(UUID id) {
-        Client client = this.clientRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
-
-        return new ClientResponse(
-                client.getId(),
-                client.getCpf(),
-                client.getNome(),
-                client.getEmail(),
-                client.getTelefone()
-        );
-    }
-
-    public ClientResponse atualizar(UUID id, ClientRequest request) {
-        Client client = this.clientRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
-
-        client.setCpf(request.cpf());
-        client.setNome(request.nome());
-        client.setEmail(request.email());
-        client.setTelefone(request.telefone());
-
-        Client updatedClient = this.clientRepository.save(client);
-
-        return new ClientResponse(
-                updatedClient.getId(),
-                updatedClient.getCpf(),
-                updatedClient.getNome(),
-                updatedClient.getEmail(),
-                updatedClient.getTelefone()
-        );
+    public List<ClientResponse> buscarPorNomeOuCpf(String nome, String cpf) {
+        if (cpf != null && !cpf.isBlank()) {
+            return this.clientRepository.findByCpf(cpf)
+                    .map(client -> new ClientResponse(
+                            client.getId(),
+                            client.getCpf(),
+                            client.getNome(),
+                            client.getEmail(),
+                            client.getTelefone()
+                    ))
+                    .map(List::of)
+                    .orElse(List.of());
+        } else if (nome != null && !nome.isBlank()) {
+            return this.clientRepository.findByNomeContainingIgnoreCase(nome)
+                    .stream()
+                    .map(client -> new ClientResponse(
+                            client.getId(),
+                            client.getCpf(),
+                            client.getNome(),
+                            client.getEmail(),
+                            client.getTelefone()
+                    ))
+                    .collect(Collectors.toList());
+        }
+        return buscarTodos();
     }
 
     public void deletar(UUID id) {

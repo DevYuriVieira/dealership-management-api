@@ -33,16 +33,12 @@ public class ClientController {
         return ResponseEntity.ok(clientes);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientResponse> buscarClientePorId(@PathVariable UUID id) {
-        ClientResponse response = this.clientService.buscarPorId(id);
-        return ResponseEntity.ok(response);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<ClientResponse> atualizarCliente(@PathVariable UUID id, @Valid @RequestBody ClientRequest request) {
-        ClientResponse response = this.clientService.atualizar(id, request);
-        return ResponseEntity.ok(response);
+    @GetMapping("/busca")
+    public ResponseEntity<List<ClientResponse>> buscarCliente(
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) String cpf) {
+        List<ClientResponse> clientes = this.clientService.buscarPorNomeOuCpf(nome, cpf);
+        return ResponseEntity.ok(clientes);
     }
 
     @DeleteMapping("/{id}")
