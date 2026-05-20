@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
@@ -31,6 +32,18 @@ public class Vehicle {
 
     @Column(nullable = false)
     private Integer ano;
+
+    @Column(nullable = false)
+    private BigDecimal valor;
+
+    @Column(nullable = false)
+    private BigDecimal maximoDesconto;
+
+    @Column(nullable = false)
+    private Boolean vendido = false;
+
+    @Column(nullable = true)
+    private BigDecimal valorVenda;
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
