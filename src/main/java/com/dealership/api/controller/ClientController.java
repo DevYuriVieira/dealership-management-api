@@ -3,6 +3,7 @@ package com.dealership.api.controller;
 import com.dealership.api.model.ClientRequest;
 import com.dealership.api.model.ClientResponse;
 import com.dealership.api.service.ClientService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public ResponseEntity<ClientResponse> cadastrarCliente(@RequestBody ClientRequest request) {
+    public ResponseEntity<ClientResponse> cadastrarCliente(@Valid @RequestBody ClientRequest request) {
         ClientResponse response = this.clientService.inserir(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
