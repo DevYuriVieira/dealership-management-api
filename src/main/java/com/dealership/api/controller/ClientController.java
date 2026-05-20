@@ -6,13 +6,10 @@ import com.dealership.api.service.ClientService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/cliente")
@@ -34,5 +31,23 @@ public class ClientController {
     public ResponseEntity<List<ClientResponse>> listarClientes() {
         List<ClientResponse> clientes = this.clientService.buscarTodos();
         return ResponseEntity.ok(clientes);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ClientResponse> buscarClientePorId(@PathVariable UUID id) {
+        ClientResponse response = this.clientService.buscarPorId(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponse> atualizarCliente(@PathVariable UUID id, @Valid @RequestBody ClientRequest request) {
+        ClientResponse response = this.clientService.atualizar(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarCliente(@PathVariable UUID id) {
+        this.clientService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }
