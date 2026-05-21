@@ -2,11 +2,11 @@ package com.dealership.api.model;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.br.CPF;
+import jakarta.validation.constraints.Pattern;
 
 public record ClientRequest(
         @NotBlank(message = "O CPF é obrigatório")
-        @CPF(message = "CPF inválido")
+        @Pattern(regexp = "^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$|^\\d{11}$", message = "O CPF deve estar no formato XXX.XXX.XXX-XX ou conter 11 números")
         String cpf,
 
         @NotBlank(message = "O nome é obrigatório")
