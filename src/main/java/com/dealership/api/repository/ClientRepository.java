@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface ClientRepository extends JpaRepository<Client, UUID> {
     List<Client> findByNomeContainingIgnoreCase(String nome);
     Optional<Client> findByCpf(String cpf);
+    boolean existsByCpf(String cpf);
 }
