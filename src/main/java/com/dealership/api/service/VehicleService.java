@@ -10,6 +10,10 @@ import com.dealership.api.repository.ClientRepository;
 import com.dealership.api.repository.VehicleRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
 @Service
 public class VehicleService {
 
@@ -46,17 +50,84 @@ public class VehicleService {
 
         Vehicle savedVehicle = this.vehicleRepository.save(vehicle);
 
+        return mapToResponse(savedVehicle);
+    }
+
+    public List<VehicleResponse> buscarTodos() {
+        return this.vehicleRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    public List<VehicleResponse> buscarPorFiltros(String placa, String marca, String modelo) {
+        if (placa != null && !placa.isBlank()) {
+            return this.vehicleRepository.findByPlacaIgnoreCase(placa)
+                    .map(this::mapToResponse)
+                    .map(List::of)
+                    .orElse(List.of());
+        } else if (marca != null && !marca.isBlank()) {
+            return this.vehicleRepository.findByMarcaIgnoreCase(marca)
+                    .stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        } else if (modelo != null && !modelo.isBlank()) {
+            return this.vehicleRepository.findByModeloIgnoreCase(modelo)
+                    .stream()
+                    .map(this::mapToResponse)
+                    .collect(Collectors.toList());
+        }
+        return buscarTodos();
+    }
+
+    public VehicleResponse atualizar(UUID id, VehicleRequest request) {
+        if (Boolean.TRUE.equals(request.vendido()) && request.valorVenda() == null) {
+            throw new IllegalArgumentException("Informe o valor da venda para registrar o veículo como vendido.");
+        }
+
+        Vehicle vehicle = this.vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com o ID: " + id));
+
+        if (!vehicle.getPlaca().equalsIgnoreCase(request.placa()) && this.vehicleRepository.existsByPlaca(request.placa())) {
+            throw new DuplicateResourceException("Já existe outro veículo cadastrado com a placa: " + request.placa());
+        }
+
+        Client donoDoVeiculo = this.clientRepository.findById(request.clientId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com o ID: " + request.clientId()));
+
+        vehicle.setPlaca(request.placa());
+        vehicle.setMarca(request.marca());
+        vehicle.setModelo(request.modelo());
+        vehicle.setAno(request.ano());
+        vehicle.setValor(request.valor());
+        vehicle.setMaximoDesconto(request.maximoDesconto());
+        vehicle.setVendido(request.vendido());
+        vehicle.setValorVenda(request.valorVenda());
+        vehicle.setClient(donoDoVeiculo);
+
+        Vehicle updatedVehicle = this.vehicleRepository.save(vehicle);
+
+        return mapToResponse(updatedVehicle);
+    }
+
+    public void deletar(UUID id) {
+        Vehicle vehicle = this.vehicleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com o ID: " + id));
+        this.vehicleRepository.delete(vehicle);
+    }
+
+    private VehicleResponse mapToResponse(Vehicle vehicle) {
         return new VehicleResponse(
-                savedVehicle.getId(),
-                savedVehicle.getPlaca(),
-                savedVehicle.getMarca(),
-                savedVehicle.getModelo(),
-                savedVehicle.getAno(),
-                savedVehicle.getValor(),
-                savedVehicle.getMaximoDesconto(),
-                savedVehicle.getVendido(),
-                savedVehicle.getValorVenda(),
-                savedVehicle.getClient().getId()
+                vehicle.getId(),
+                vehicle.getPlaca(),
+                vehicle.getMarca(),
+                vehicle.getModelo(),
+                vehicle.getAno(),
+                vehicle.getValor(),
+                vehicle.getMaximoDesconto(),
+                vehicle.getVendido(),
+                vehicle.getValorVenda(),
+                vehicle.getClient().getId()
         );
     }
 }
