@@ -26,6 +26,9 @@ public class ClientService {
         if (this.clientRepository.existsByCpf(request.cpf())) {
             throw new DuplicateResourceException("CPF já cadastrado: " + request.cpf());
         }
+        if (this.clientRepository.existsByEmail(request.email())) {
+            throw new DuplicateResourceException("E-mail já cadastrado: " + request.email());
+        }
 
         Client client = new Client();
         client.setCpf(request.cpf());
