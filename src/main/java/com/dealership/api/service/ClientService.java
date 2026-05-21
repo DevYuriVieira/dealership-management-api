@@ -1,6 +1,7 @@
 package com.dealership.api.service;
 
 import com.dealership.api.entity.Client;
+import com.dealership.api.exception.DuplicateResourceException;
 import com.dealership.api.model.ClientRequest;
 import com.dealership.api.model.ClientResponse;
 import com.dealership.api.repository.ClientRepository;
@@ -22,6 +23,10 @@ public class ClientService {
     }
 
     public ClientResponse inserir(ClientRequest request) {
+        if (this.clientRepository.existsByCpf(request.cpf())) {
+            throw new DuplicateResourceException("CPF já cadastrado: " + request.cpf());
+        }
+
         Client client = new Client();
         client.setCpf(request.cpf());
         client.setNome(request.nome());
