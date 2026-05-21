@@ -18,7 +18,7 @@ public record VehicleRequest(
         String modelo,
 
         @NotNull(message = "Informe o ano de fabricação.")
-        @Min(value = 1990, message = "O ano deve ser maior ou igual a 1900.")
+        @Min(value = 1990, message = "O ano deve ser maior ou igual a 1990.")
         @Max(value = 2027, message = "O ano do veículo não pode ser superior a 2027.")
         Integer ano,
 
