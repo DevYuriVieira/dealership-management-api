@@ -18,7 +18,7 @@ public class Client {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(unique = true, nullable = false, length = 11)
+    @Column(unique = true, nullable = false, length = 14)
     private String cpf;
 
     @Column(nullable = false)
