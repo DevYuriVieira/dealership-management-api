@@ -26,19 +26,24 @@ public class VehicleService {
     }
 
     public VehicleResponse inserir(VehicleRequest request) {
+        String placaPadronizada = request.placa() != null ? request.placa().toUpperCase() : null;
+
         if (Boolean.TRUE.equals(request.vendido()) && request.valorVenda() == null) {
             throw new IllegalArgumentException("Informe o valor da venda para registrar o veículo como vendido.");
         }
+        if (Boolean.FALSE.equals(request.vendido()) && request.valorVenda() != null) {
+            throw new IllegalArgumentException("Um veículo não vendido não pode ter um valor de venda estipulado.");
+        }
 
-        if (this.vehicleRepository.existsByPlaca(request.placa())) {
-            throw new DuplicateResourceException("Já existe um veículo cadastrado com a placa: " + request.placa());
+        if (this.vehicleRepository.existsByPlaca(placaPadronizada)) {
+            throw new DuplicateResourceException("Já existe um veículo cadastrado com a placa: " + placaPadronizada);
         }
 
         Client donoDoVeiculo = this.clientRepository.findById(request.clientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com o ID: " + request.clientId()));
 
         Vehicle vehicle = new Vehicle();
-        vehicle.setPlaca(request.placa());
+        vehicle.setPlaca(placaPadronizada);
         vehicle.setMarca(request.marca());
         vehicle.setModelo(request.modelo());
         vehicle.setAno(request.ano());
@@ -81,21 +86,26 @@ public class VehicleService {
     }
 
     public VehicleResponse atualizar(UUID id, VehicleRequest request) {
+        String placaPadronizada = request.placa() != null ? request.placa().toUpperCase() : null;
+
         if (Boolean.TRUE.equals(request.vendido()) && request.valorVenda() == null) {
             throw new IllegalArgumentException("Informe o valor da venda para registrar o veículo como vendido.");
+        }
+        if (Boolean.FALSE.equals(request.vendido()) && request.valorVenda() != null) {
+            throw new IllegalArgumentException("Um veículo não vendido não pode ter um valor de venda estipulado.");
         }
 
         Vehicle vehicle = this.vehicleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado com o ID: " + id));
 
-        if (!vehicle.getPlaca().equalsIgnoreCase(request.placa()) && this.vehicleRepository.existsByPlaca(request.placa())) {
-            throw new DuplicateResourceException("Já existe outro veículo cadastrado com a placa: " + request.placa());
+        if (!vehicle.getPlaca().equalsIgnoreCase(placaPadronizada) && this.vehicleRepository.existsByPlaca(placaPadronizada)) {
+            throw new DuplicateResourceException("Já existe outro veículo cadastrado com a placa: " + placaPadronizada);
         }
 
         Client donoDoVeiculo = this.clientRepository.findById(request.clientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente não encontrado com o ID: " + request.clientId()));
 
-        vehicle.setPlaca(request.placa());
+        vehicle.setPlaca(placaPadronizada);
         vehicle.setMarca(request.marca());
         vehicle.setModelo(request.modelo());
         vehicle.setAno(request.ano());

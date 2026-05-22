@@ -1,14 +1,13 @@
 package com.dealership.api.model;
 
 import jakarta.validation.constraints.*;
-import org.hibernate.validator.constraints.Length;
 
 import java.math.BigDecimal;
 import java.util.UUID;
 
 public record VehicleRequest(
         @NotBlank(message = "Informe a placa do veículo.")
-        @Length(max = 7, message = "A placa deve ter no máximo 7 caracteres.")
+        @Pattern(regexp = "^[a-zA-Z]{3}-?\\d[a-zA-Z0-9]\\d{2}$", message = "Formato de placa inválido. Use o padrão ABC-1234 ou ABC1D23")
         String placa,
 
         @NotBlank(message = "Informe a marca do veículo.")
